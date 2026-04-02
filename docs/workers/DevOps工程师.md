@@ -159,4 +159,4 @@ echo "=== Frontend ===" && curl -s -o /dev/null -w "%{http_code}" http://localho
 
 ---
 
-*关联方案：[方案五](../schemes/scheme-05-solo-fullstack.md)*
+*关联方案：[方案五](../schemes/方案五：全栈独立开发者.md)*

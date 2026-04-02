@@ -12,40 +12,46 @@
 
 | 档案 | 角色 | 推荐 CLI | 典型方案 |
 |------|------|----------|---------|
-| [编码助手](worker-coding-assistant.md) | 前端/全栈编码 | Claude Code | 方案一/三/五 |
-| [后端开发](worker-backend-dev.md) | 后端 API 开发 | Claude Code | 方案五 |
-| [TypeScript 类型工程师](worker-type-engineer.md) | 类型系统维护 | Claude Code | 方案三 |
+| [编码助手](编码助手.md) | 前端/全栈编码 | Claude Code | 方案一/三/五 |
+| [后端开发](后端开发.md) | 后端 API 开发 | Claude Code | 方案五 |
+| [TypeScript 类型工程师](TypeScript类型工程师.md) | 类型系统维护 | Claude Code | 方案三 |
 
 ### 🔍 审查类
 
 | 档案 | 角色 | 推荐 CLI | 典型方案 |
 |------|------|----------|---------|
-| [安全审查员](worker-security-reviewer.md) | 安全漏洞检查 | Claude Code (沙盒) | 方案二/五 |
-| [架构审查员](worker-architecture-reviewer.md) | 架构设计评审 | Gemini CLI | 方案二 |
-| [UI/UX 审查员](worker-uiux-reviewer.md) | 可访问性/体验审查 | Claude Code | 方案二 |
-| [性能审查员](worker-performance-reviewer.md) | 性能优化分析 | Gemini CLI | 方案二 |
+| [安全审查员](安全审查员.md) | 安全漏洞检查 | Claude Code (沙盒) | 方案二/五 |
+| [架构审查员](架构审查员.md) | 架构设计评审 | Gemini CLI | 方案二 |
+| [UI/UX 审查员](UI-UX审查员.md) | 可访问性/体验审查 | Claude Code | 方案二 |
+| [性能审查员](性能审查员.md) | 性能优化分析 | Gemini CLI | 方案二 |
 
 ### 🧪 测试类
 
 | 档案 | 角色 | 推荐 CLI | 典型方案 |
 |------|------|----------|---------|
-| [测试专家](worker-test-expert.md) | 单元测试编写 | Claude Code | 方案一/四 |
-| [E2E 测试专家](worker-e2e-expert.md) | 端到端测试 | Claude Code | 方案四 |
+| [测试专家](测试专家.md) | 单元测试编写 | Claude Code | 方案一/四 |
+| [E2E 测试专家](E2E测试专家.md) | 端到端测试 | Claude Code | 方案四 |
 
 ### ⚙️ 基础设施类
 
 | 档案 | 角色 | 推荐 CLI | 典型方案 |
 |------|------|----------|---------|
-| [Shell 执行器](worker-shell-executor.md) | 命令执行 | bash/zsh | 方案一/四/五 |
-| [DevOps 工程师](worker-devops-engineer.md) | 部署/CI/CD | bash/zsh | 方案五 |
-| [数据库设计师](worker-database-designer.md) | Schema 设计 | Gemini CLI | 方案五 |
+| [Shell 执行器](Shell执行器.md) | 命令执行 | bash/zsh | 方案一/四/五 |
+| [DevOps 工程师](DevOps工程师.md) | 部署/CI/CD | bash/zsh | 方案五 |
+| [数据库设计师](数据库设计师.md) | Schema 设计 | Gemini CLI | 方案五 |
 
 ### 📝 文档/研究类
 
 | 档案 | 角色 | 推荐 CLI | 典型方案 |
 |------|------|----------|---------|
-| [文档工程师](worker-docs-writer.md) | 文档编写 | Gemini CLI | 方案三/五/六 |
-| [技术研究员](worker-researcher.md) | 技术调研 | Claude/Gemini | 方案六 |
+| [文档工程师](文档工程师.md) | 文档编写 | Gemini CLI | 方案三/五/六 |
+| [技术研究员](技术研究员.md) | 技术调研 | Claude/Gemini | 方案六 |
+
+### 🧠 管理/调度类
+
+| 档案 | 角色 | 推荐 CLI | 典型方案 |
+|------|------|----------|---------|
+| [需求分析师](需求分析师.md) | 需求分析、任务拆解、统筹调度 | Claude Code | 方案七 |
 
 ---
 
@@ -86,6 +92,11 @@
 前端 ×2 + 后端 ×1 + 数据库 ×1 + DevOps ×1 + 文档 ×1 + 审查 ×1
 ```
 
+### 需求驱动模式（方案七）
+```
+需求分析师 ×1 + 其他员工按需激活（分析师会推荐）
+```
+
 ---
 
 ## 自定义新角色
@@ -111,4 +122,4 @@
 
 ---
 
-*关联文档：[前端开发者指南](../frontend-developer-guide.md) | [方案文档](../schemes/)*
+*关联文档：[前端开发者指南](../前端开发者实战配置指南.md) | [方案文档](../schemes/)*

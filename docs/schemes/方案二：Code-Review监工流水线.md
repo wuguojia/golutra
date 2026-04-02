@@ -398,4 +398,4 @@
 
 ---
 
-*关联文档：[安全审查员](../workers/worker-security-reviewer.md) | [架构审查员](../workers/worker-architecture-reviewer.md) | [UI/UX 审查员](../workers/worker-uiux-reviewer.md) | [性能审查员](../workers/worker-performance-reviewer.md)*
+*关联文档：[安全审查员](../workers/安全审查员.md) | [架构审查员](../workers/架构审查员.md) | [UI/UX 审查员](../workers/UI-UX审查员.md) | [性能审查员](../workers/性能审查员.md)*

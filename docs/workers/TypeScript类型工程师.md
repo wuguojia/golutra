@@ -134,4 +134,4 @@ API 列表：
 
 ---
 
-*关联方案：[方案三](../schemes/scheme-03-component-factory.md)*
+*关联方案：[方案三](../schemes/方案三：前端组件工厂.md)*

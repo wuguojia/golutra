@@ -144,4 +144,4 @@ Page Object：tests/e2e/pages/{页面名}Page.ts
 
 ---
 
-*关联方案：[方案四](../schemes/scheme-04-test-automation.md)*
+*关联方案：[方案四](../schemes/方案四：前端测试自动化军团.md)*

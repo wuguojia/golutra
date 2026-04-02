@@ -141,4 +141,4 @@ cd {项目路径} && git status && echo "---" && git diff --stat
 
 ---
 
-*关联方案：[方案一](../schemes/scheme-01-personal-fullstack.md) | [方案四](../schemes/scheme-04-test-automation.md) | [方案五](../schemes/scheme-05-solo-fullstack.md)*
+*关联方案：[方案一](../schemes/方案一：个人前端全栈工作流.md) | [方案四](../schemes/方案四：前端测试自动化军团.md) | [方案五](../schemes/方案五：全栈独立开发者.md)*

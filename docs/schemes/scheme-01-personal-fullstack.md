@@ -1,0 +1,460 @@
+# 方案一：个人前端全栈工作流
+
+> **方案代号**：Personal Fullstack  
+> **适用场景**：日常前端开发，一个人搞定编码 + 测试 + 文档  
+> **推荐指数**：⭐⭐⭐⭐⭐（入门首选）  
+> **所需 CLI**：Claude Code + 系统终端  
+> **AI 员工总数**：4 个  
+> **预计效率提升**：300%–500%
+
+---
+
+## 一、方案概述
+
+这是最基础也是最实用的方案。你作为监工（Owner），指挥 2 个编码助手、1 个测试助手和 1 个 Shell 执行器并行工作。适合日常的前端页面开发、组件编写、Bug 修复等场景。
+
+### 核心理念
+
+```
+你（监工）
+  │
+  ├── @编码助手-1  →  负责功能模块 A
+  ├── @编码助手-2  →  负责功能模块 B
+  ├── @测试助手    →  负责所有测试编写
+  └── @Shell执行器 →  负责构建/运行/验证
+```
+
+### 为什么是 2 个编码助手？
+
+- 1 个太少：你下发任务后只能串行等待
+- 2 个刚好：可以同时开发两个不同模块/页面/组件
+- 3 个以上：对日常开发来说管理成本增加，收益递减
+
+---
+
+## 二、完整成员配置
+
+### 2.1 成员配置表
+
+| # | 角色定位 | roleType | terminalType | terminalCommand | instances | unlimitedAccess | sandboxed | 命名示例 |
+|---|---------|----------|-------------|-----------------|-----------|----------------|-----------|---------|
+| 0 | 👑 你（监工） | `owner` | — | — | 1 | — | — | Owner |
+| 1 | 🤖 编码助手 | `assistant` | `claude` | `claude` | 2 | ✅ `true` | ❌ `false` | myapp-assistant-claude-1/2 |
+| 2 | 🧪 测试助手 | `assistant` | `claude` | `claude` | 1 | ✅ `true` | ❌ `false` | myapp-assistant-claude-3 |
+| 3 | 📟 Shell 执行器 | `assistant` | `shell` | `bash` | 1 | ✅ `true` | ❌ `false` | myapp-assistant-terminal-1 |
+
+### 2.2 配置参数详解
+
+#### 编码助手（×2）
+
+```json
+{
+  "roleType": "assistant",
+  "terminalType": "claude",
+  "terminalCommand": "claude",
+  "autoStartTerminal": true,
+  "unlimitedAccess": true,
+  "sandboxed": false
+}
+```
+
+- **为什么 unlimitedAccess = true**：编码助手是主力，需要高频使用，不能被限流
+- **为什么 sandboxed = false**：编码助手需要读写项目文件，沙盒会限制文件访问
+- **为什么 autoStartTerminal = true**：每天打开工作区自动就绪
+
+#### 测试助手（×1）
+
+```json
+{
+  "roleType": "assistant",
+  "terminalType": "claude",
+  "terminalCommand": "claude",
+  "autoStartTerminal": true,
+  "unlimitedAccess": true,
+  "sandboxed": false
+}
+```
+
+- 与编码助手相同配置，但通过不同的 Prompt 定义其"测试专家"身份
+- 测试助手不需要沙盒，因为它需要读取源码来写测试
+
+#### Shell 执行器（×1）
+
+```json
+{
+  "roleType": "assistant",
+  "terminalType": "shell",
+  "terminalCommand": "bash",
+  "autoStartTerminal": true,
+  "unlimitedAccess": true,
+  "sandboxed": false
+}
+```
+
+- **terminalType = shell**：不连接 AI 模型，直接执行系统命令
+- 用于运行 `pnpm build`、`pnpm test`、`pnpm lint` 等构建命令
+- 不需要 AI 智能，只需要命令执行能力
+
+### 2.3 project-data.json 示例
+
+```json
+{
+  "projectId": "01JWXYZ...",
+  "version": 1,
+  "members": [
+    {
+      "id": "01J00000000000000000000000",
+      "name": "Owner",
+      "roleKey": "members.roles.owner",
+      "roleType": "owner",
+      "avatar": "css:orbit",
+      "status": "online"
+    },
+    {
+      "id": "01JWXYZ001",
+      "name": "myapp-assistant-claude-1",
+      "roleKey": "members.roles.aiAssistant",
+      "roleType": "assistant",
+      "avatar": "css:ember",
+      "status": "online",
+      "terminalType": "claude",
+      "terminalCommand": "claude",
+      "autoStartTerminal": true,
+      "unlimitedAccess": true,
+      "sandboxed": false
+    },
+    {
+      "id": "01JWXYZ002",
+      "name": "myapp-assistant-claude-2",
+      "roleKey": "members.roles.aiAssistant",
+      "roleType": "assistant",
+      "avatar": "css:mint",
+      "status": "online",
+      "terminalType": "claude",
+      "terminalCommand": "claude",
+      "autoStartTerminal": true,
+      "unlimitedAccess": true,
+      "sandboxed": false
+    },
+    {
+      "id": "01JWXYZ003",
+      "name": "myapp-assistant-claude-3",
+      "roleKey": "members.roles.aiAssistant",
+      "roleType": "assistant",
+      "avatar": "css:canyon",
+      "status": "online",
+      "terminalType": "claude",
+      "terminalCommand": "claude",
+      "autoStartTerminal": true,
+      "unlimitedAccess": true,
+      "sandboxed": false
+    },
+    {
+      "id": "01JWXYZ004",
+      "name": "myapp-assistant-terminal-1",
+      "roleKey": "members.roles.aiAssistant",
+      "roleType": "assistant",
+      "avatar": "css:storm",
+      "status": "online",
+      "terminalType": "shell",
+      "terminalCommand": "bash",
+      "autoStartTerminal": true,
+      "unlimitedAccess": true,
+      "sandboxed": false
+    }
+  ],
+  "memberSequence": {
+    "myapp-assistant-claude": 4,
+    "myapp-assistant-terminal": 2
+  },
+  "terminal": { "recentClosedTabs": [] },
+  "roadmap": { "objective": "", "tasks": [] },
+  "skills": { "current": [] }
+}
+```
+
+---
+
+## 三、架构设计
+
+### 3.1 信息流架构
+
+```
+┌──────────────────────────────────────────────────────┐
+│                  golutra 工作区                        │
+│                                                      │
+│  ┌──────┐    群聊 @All / 私聊 @成员                    │
+│  │ 你    │──────────────────────────────┐             │
+│  │ Owner │                             ▼             │
+│  └──────┘    ┌─────────────────────────────┐         │
+│              │     编排引擎 (dispatch.rs)    │         │
+│              └──┬──────┬──────┬──────┬─────┘         │
+│                 ▼      ▼      ▼      ▼               │
+│              ┌────┐ ┌────┐ ┌────┐ ┌────┐             │
+│              │编码1│ │编码2│ │测试 │ │Shell│             │
+│              │PTY │ │PTY │ │PTY │ │PTY │             │
+│              └──┬─┘ └──┬─┘ └──┬─┘ └──┬─┘             │
+│                 ▼      ▼      ▼      ▼               │
+│              Claude  Claude  Claude  bash             │
+│              Code    Code    Code                     │
+│                                                      │
+│  ◄──── 所有输出回流到聊天界面 + ReDB 持久化 ────►        │
+└──────────────────────────────────────────────────────┘
+```
+
+### 3.2 任务分配矩阵
+
+| 任务类型 | 分配给 | 协作方式 | 预计耗时（对比手动） |
+|---------|--------|---------|-------------------|
+| 新页面开发 | 编码助手-1 或 -2 | 独立执行 | 30min → 10min |
+| 新组件开发 | 编码助手-1 或 -2 | 独立执行 | 45min → 15min |
+| Bug 修复 | 编码助手-1 | 独立执行 | 20min → 5min |
+| 单元测试 | 测试助手 | 等编码完成后开始 | 30min → 8min |
+| 代码构建 | Shell 执行器 | 随时执行 | 手动 → 自动 |
+| Lint 检查 | Shell 执行器 | 随时执行 | 手动 → 自动 |
+
+### 3.3 状态机与监控
+
+```
+助手状态流转：
+  Online (🟢) ──发送指令──→ Working (🔵) ──任务完成──→ Online (🟢)
+                                │
+                            超时 4.5s 无输出
+                                │
+                                ▼
+                          Online (🟢)
+```
+
+**监控要点**：
+- 编码助手状态长时间为 Working → 检查是否在等待确认（终端注入 `y`）
+- Shell 执行器执行时间异常长 → 检查命令是否卡住
+- 测试助手输出错误 → 给编码助手发修复指令
+
+---
+
+## 四、日常使用流程
+
+### 4.1 启动流程
+
+```
+1. 打开 golutra 桌面端
+2. 选择/创建工作区 → 指向你的前端项目目录
+   例如: ~/projects/my-vue-app
+3. 首次使用：点击邀请按钮
+   ├── 邀请 2 个 Claude 助手（编码用）
+   ├── 邀请 1 个 Claude 助手（测试用）
+   └── 邀请 1 个 Shell 终端（执行用）
+4. 所有助手自动上线（autoStartTerminal: true）
+5. 开始工作！
+```
+
+### 4.2 场景一：并行开发两个页面
+
+```
+你（群聊 @All）: 
+"今天要完成用户管理模块的两个页面：
+ - 用户列表页 (UserList.vue)
+ - 用户详情页 (UserDetail.vue)"
+
+你 → 私聊 @编码助手-1:
+"用 Vue 3 Composition API + TypeScript 实现 UserList.vue：
+ - 技术栈：Vue 3.5+, TypeScript, Tailwind CSS
+ - 功能：分页表格、搜索过滤、批量操作
+ - API: GET /api/users?page=1&size=20&keyword=xxx
+ - 组件：使用 <DataTable> 封装
+ - 要求：响应式布局，支持暗色模式"
+
+你 → 私聊 @编码助手-2（同时）:
+"用 Vue 3 Composition API + TypeScript 实现 UserDetail.vue：
+ - 技术栈同上
+ - 功能：用户信息展示、编辑表单、头像上传
+ - API: GET/PUT /api/users/:id
+ - 要求：表单校验、乐观更新"
+
+（两个助手并行编码，你轮流点击头像查看进度）
+
+编码完成后 → 私聊 @测试助手:
+"为 UserList.vue 和 UserDetail.vue 编写 Vitest 单元测试，
+ 覆盖：渲染、交互、API 调用 mock、边界情况"
+
+测试代码完成后 → 私聊 @Shell执行器:
+"cd ~/projects/my-vue-app && pnpm test -- --coverage && pnpm lint"
+```
+
+### 4.3 场景二：Bug 修复流程
+
+```
+你 → 私聊 @编码助手-1:
+"Bug 描述：UserList 页面在筛选后切换分页，筛选条件丢失
+ 复现：输入关键字 → 搜索 → 翻到第 2 页 → 关键字消失
+ 期望：分页切换应保留筛选条件
+ 请分析根因并修复"
+
+（等待 Working → Online）
+
+你 → 查看输出，确认修复方案合理
+
+你 → 私聊 @测试助手:
+"为刚修复的分页+筛选联动逻辑补充回归测试"
+
+你 → 私聊 @Shell执行器:
+"pnpm test && pnpm lint && pnpm build"
+```
+
+### 4.4 场景三：代码重构
+
+```
+你 → 私聊 @编码助手-1:
+"重构 src/composables/useUserList.ts：
+ - 将 API 调用抽取为独立的 useUserApi composable
+ - 分页逻辑抽取为 usePagination composable
+ - 搜索逻辑抽取为 useSearch composable
+ - 确保所有现有功能不受影响"
+
+你 → 私聊 @编码助手-2（同时）:
+"审查 src/composables/ 目录下的所有 composable：
+ - 检查 TypeScript 类型是否完整
+ - 检查是否有内存泄漏风险（onUnmounted 清理）
+ - 检查命名是否符合 use* 约定
+ - 输出审查报告"
+```
+
+---
+
+## 五、监工策略详解
+
+### 5.1 实时监控
+
+| 监控方式 | 操作 | 适用场景 |
+|---------|------|---------|
+| 点击头像 | 查看终端实时输出 | 关注某个助手的执行过程 |
+| 观察状态 | Working → Online | 判断任务是否完成 |
+| 终端注入 | 直接在终端追加指令 | 紧急修正、补充说明 |
+| 群聊 @All | 广播消息 | 通知全体、改变方向 |
+
+### 5.2 干预策略
+
+**何时干预**：
+- 助手方向偏了 → 终端注入修正
+- 助手卡住了 → 终端注入 `y` 或 `/clear`
+- 输出不符合预期 → 追加详细说明
+- 需要调整优先级 → 群聊通知
+
+**干预模板**：
+```
+// 方向修正
+"停止当前操作。不要使用 Options API，改用 Composition API <script setup> 语法"
+
+// 补充细节
+"补充：按钮颜色使用设计系统变量 --color-primary，不要硬编码"
+
+// 紧急中断
+"暂停。先 commit 当前改动，我需要检查一下"
+```
+
+### 5.3 质量把控
+
+```
+开发完成后的检查清单：
+
+□ 编码助手输出是否符合 TypeScript 严格模式
+□ 组件是否使用 defineProps + withDefaults
+□ 事件是否使用 defineEmits 类型声明
+□ 测试助手覆盖了核心逻辑
+□ Shell 执行器：pnpm lint 无错误
+□ Shell 执行器：pnpm test 全部通过
+□ Shell 执行器：pnpm build 成功
+```
+
+---
+
+## 六、Skill（技能）配置
+
+### 6.1 推荐技能集
+
+| 技能名称 | 图标 | 版本 | 用途 |
+|---------|------|------|------|
+| Vue 3 开发 | 🎨 | 1.0 | 组件开发规范 |
+| TypeScript | 📝 | 1.0 | 类型系统约束 |
+| Tailwind CSS | 🎭 | 1.0 | 样式编写规范 |
+| Vitest 测试 | 🧪 | 1.0 | 测试编写规范 |
+
+### 6.2 技能配置示例
+
+```json
+{
+  "skills": {
+    "current": [
+      {
+        "nameKey": "skill.vue3",
+        "icon": "🎨",
+        "color": "#42b883",
+        "bg": "rgba(66, 184, 131, 0.1)",
+        "ring": "rgba(66, 184, 131, 0.3)",
+        "ver": "1.0"
+      },
+      {
+        "nameKey": "skill.typescript",
+        "icon": "📝",
+        "color": "#3178c6",
+        "bg": "rgba(49, 120, 198, 0.1)",
+        "ring": "rgba(49, 120, 198, 0.3)",
+        "ver": "1.0"
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 七、Roadmap 集成
+
+### 7.1 日常 Sprint 示例
+
+```json
+{
+  "roadmap": {
+    "objective": "完成用户管理模块 MVP",
+    "tasks": [
+      { "id": 1, "number": "01", "title": "UserList 页面开发", "status": "done" },
+      { "id": 2, "number": "02", "title": "UserDetail 页面开发", "status": "in-progress" },
+      { "id": 3, "number": "03", "title": "用户管理单元测试", "status": "pending" },
+      { "id": 4, "number": "04", "title": "构建验证 & Lint 检查", "status": "pending" }
+    ]
+  }
+}
+```
+
+### 7.2 任务状态流转
+
+```
+pending → in-progress → done
+  ↑           │
+  └───────────┘  (如果需要返工)
+```
+
+---
+
+## 八、扩缩容建议
+
+| 场景 | 调整方案 | 助手总数 |
+|------|---------|---------|
+| 任务量少 | 去掉 1 个编码助手 | 3 |
+| 需要 Code Review | 加 1 个审查助手 | 5 |
+| 大量页面开发 | 加到 3-4 个编码助手 | 5-6 |
+| 需要 E2E 测试 | 加 1 个 E2E 助手 | 5 |
+
+---
+
+## 九、注意事项
+
+1. **CLI 前置条件**：确保 `claude` 命令在系统 PATH 中可用
+2. **项目目录**：工作区需指向实际项目根目录
+3. **资源占用**：4 个终端同时运行约占 2-4GB 内存
+4. **消息节奏**：等一个助手回复完再发下一条，避免 Batcher 合并
+5. **数据安全**：避免在聊天中输入 API Key 等敏感信息
+
+---
+
+*关联文档：[AI 员工档案 - 编码助手](../workers/worker-coding-assistant.md) | [AI 员工档案 - 测试专家](../workers/worker-test-expert.md) | [AI 员工档案 - Shell 执行器](../workers/worker-shell-executor.md)*

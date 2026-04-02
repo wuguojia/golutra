@@ -1,0 +1,349 @@
+# 方案五：全栈独立开发者（一人公司模式）
+
+> **方案代号**：Solo Fullstack  
+> **适用场景**：独立开发者全栈交付，前后端 + DevOps 全包  
+> **推荐指数**：⭐⭐⭐⭐⭐  
+> **所需 CLI**：Claude Code + Gemini CLI + 系统终端  
+> **AI 员工总数**：7 个多功能角色  
+> **预计效率提升**：800%–1300%（一人团队 → AI 军团）
+
+---
+
+## 一、方案概述
+
+独立开发者/一人公司模式是 golutra 的终极形态。你一个人扮演 CEO，指挥 7 个 AI 员工覆盖前端、后端、数据库、DevOps、文档和代码审查全链路。
+
+### 核心理念
+
+```
+你（CEO 兼 CTO）
+  │
+  ├── 🎨 前端开发 ×2 (Claude)  →  页面、组件、样式
+  ├── ⚙️ 后端开发 ×1 (Claude)  →  API、业务逻辑
+  ├── 📊 数据库设计 ×1 (Gemini) →  Schema、SQL、迁移
+  ├── 🚀 DevOps ×1 (Shell)    →  Docker、CI/CD、部署
+  ├── 📝 产品文档 ×1 (Gemini)  →  API 文档、README
+  └── 🔍 代码审查 ×1 (Claude)  →  安全审查、质量把关
+```
+
+### 为什么混合多个 CLI？
+
+- **Claude Code**：代码编写质量最高，适合前端/后端/审查
+- **Gemini CLI**：信息组织能力强，适合数据库设计和文档编写
+- **Shell**：DevOps 需要直接执行系统命令，不需要 AI 推理
+
+---
+
+## 二、完整成员配置
+
+### 2.1 成员配置表
+
+| # | 角色定位 | roleType | terminalType | terminalCommand | instances | unlimitedAccess | sandboxed |
+|---|---------|----------|-------------|-----------------|-----------|----------------|-----------|
+| 0 | 👑 CEO | `owner` | — | — | 1 | — | — |
+| 1 | 🎨 前端开发 | `assistant` | `claude` | `claude` | 2 | ✅ | ❌ |
+| 2 | ⚙️ 后端开发 | `assistant` | `claude` | `claude` | 1 | ✅ | ❌ |
+| 3 | 📊 数据库设计 | `assistant` | `gemini` | `gemini` | 1 | ✅ | ❌ |
+| 4 | 🚀 DevOps | `assistant` | `shell` | `bash` | 1 | ✅ | ❌ |
+| 5 | 📝 产品文档 | `assistant` | `gemini` | `gemini` | 1 | ✅ | ❌ |
+| 6 | 🔍 代码审查 | `assistant` | `claude` | `claude` | 1 | ✅ | ✅ **开启** |
+
+### 2.2 关键配置说明
+
+- **前端开发 ×2**：最常用的角色，2 个实例可以并行开发不同页面
+- **代码审查沙盒模式**：安全审查不需要执行代码，沙盒隔离更安全
+- **DevOps 用 Shell**：Docker 命令、npm scripts 需要直接执行
+
+---
+
+## 三、架构设计
+
+### 3.1 全栈协作架构
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                   Solo Fullstack Architecture                     │
+│                                                                  │
+│  ┌──────┐                                                        │
+│  │ CEO  │── Sprint 规划 → Roadmap                                 │
+│  └──┬───┘                                                        │
+│     │                                                            │
+│     ├── Phase 1: 基础设施 ──────────────────────────┐             │
+│     │   📊 数据库设计 → Schema + 迁移脚本             │             │
+│     │   🚀 DevOps → Docker + CI/CD                  │ 并行        │
+│     │                                               │             │
+│     ├── Phase 2: 核心开发 ──────────────────────────┤             │
+│     │   ⚙️ 后端 → API 实现                           │             │
+│     │   🎨 前端-1 → 页面 A                           │ 并行        │
+│     │   🎨 前端-2 → 页面 B                           │             │
+│     │                                               │             │
+│     ├── Phase 3: 质量保证 ──────────────────────────┤             │
+│     │   🔍 代码审查 → 安全 + 质量                     │             │
+│     │   🚀 DevOps → 运行测试                         │ 并行        │
+│     │                                               │             │
+│     └── Phase 4: 交付 ─────────────────────────────┘             │
+│         📝 产品文档 → API 文档 + README                           │
+│         🚀 DevOps → 部署上线                                     │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### 3.2 依赖关系图
+
+```
+数据库设计 ──→ 后端开发 ──→ 前端开发
+    │              │            │
+    │              ▼            ▼
+    │         代码审查 ←─── 代码审查
+    │              │
+    ▼              ▼
+  DevOps ──→ 部署 + 测试
+                │
+                ▼
+            产品文档
+```
+
+---
+
+## 四、Sprint 全流程详解
+
+### 4.1 Sprint 规划
+
+```
+你（群聊 @All）:
+"本周 Sprint 目标：完成用户管理模块 MVP
+
+功能需求：
+  - 用户注册/登录
+  - 用户列表（搜索、分页）
+  - 用户详情（查看、编辑）
+  - 用户权限管理
+
+技术栈：
+  - 前端：Vue 3 + TypeScript + Tailwind CSS
+  - 后端：Node.js + Express + TypeScript
+  - 数据库：PostgreSQL
+  - 部署：Docker + Nginx
+
+各位准备好，我会按阶段下发任务。"
+```
+
+### 4.2 Phase 1：基础设施（并行）
+
+```
+你 → 私聊 @数据库设计:
+"设计用户管理模块的数据库 Schema。
+
+需要的表：
+1. users - 用户基本信息
+   - id (UUID, PK)
+   - email (unique, not null)
+   - password_hash (not null)
+   - name (varchar 100)
+   - avatar_url (text)
+   - role (enum: admin, user, viewer)
+   - status (enum: active, disabled, deleted)
+   - created_at, updated_at (timestamp)
+
+2. user_sessions - 用户会话
+   - id (UUID, PK)
+   - user_id (FK → users)
+   - token (unique)
+   - expires_at (timestamp)
+   - created_at (timestamp)
+
+请输出：
+1. CREATE TABLE DDL 语句
+2. 索引建议
+3. TypeScript 类型定义（与 ORM 对应）
+4. 种子数据 SQL"
+
+你 → 私聊 @DevOps（同时）:
+"搭建项目开发环境：
+
+docker-compose.yml 包含：
+  - PostgreSQL 16 (port 5432, 数据持久化)
+  - Node.js 20 (backend, port 3001)
+  - Nginx (前端静态文件, port 80)
+  - PGAdmin (可选, port 5050)
+
+配置文件：
+  - .env.development 环境变量模板
+  - Dockerfile.backend (Node.js multi-stage build)
+  - nginx.conf (SPA history mode 支持)
+
+CI/CD：
+  - .github/workflows/ci.yml (lint + test + build)
+  - .github/workflows/deploy.yml (Docker build + push)"
+```
+
+### 4.3 Phase 2：核心开发（并行）
+
+```
+（等 Phase 1 完成后）
+
+你 → 私聊 @后端开发:
+"用 Express + TypeScript 实现用户管理 API：
+
+路由：
+  POST   /api/auth/register  - 用户注册
+  POST   /api/auth/login     - 用户登录
+  POST   /api/auth/logout    - 用户登出
+  GET    /api/users          - 用户列表（分页、搜索）
+  GET    /api/users/:id      - 用户详情
+  PUT    /api/users/:id      - 更新用户
+  DELETE /api/users/:id      - 删除用户（软删除）
+
+要求：
+  - 使用 bcrypt 加密密码
+  - JWT 认证中间件
+  - 输入验证（zod）
+  - 错误处理中间件
+  - TypeScript 严格模式"
+
+你 → 私聊 @前端-1（同时）:
+"用 Vue 3 + TypeScript 实现登录/注册页面：
+  - 登录页：email + password，记住我，忘记密码链接
+  - 注册页：email + password + 确认密码 + 用户名
+  - 表单校验：实时校验 + 提交校验
+  - API 对接：/api/auth/register, /api/auth/login
+  - Token 存储：Pinia store + localStorage
+  - 路由守卫：未登录跳转到登录页"
+
+你 → 私聊 @前端-2（同时）:
+"用 Vue 3 + TypeScript 实现用户管理页面：
+  - 用户列表页：表格展示、搜索、分页、批量操作
+  - 用户详情页：信息展示、编辑表单、头像上传
+  - API 对接：/api/users 系列接口
+  - 权限控制：admin 可编辑/删除，viewer 只读
+  - 加载状态：skeleton loading
+  - 错误处理：网络错误、权限错误提示"
+```
+
+### 4.4 Phase 3：质量保证
+
+```
+你 → 私聊 @代码审查:
+"审查本次 Sprint 所有新增代码。
+
+审查范围：
+  - 后端 API 实现
+  - 前端页面和组件
+  - 数据库 Schema 设计
+
+重点检查：
+  1. SQL 注入风险
+  2. XSS 风险
+  3. 认证/授权逻辑漏洞
+  4. 密码存储安全性
+  5. API 输入验证是否充分
+  6. CORS 配置是否正确
+
+输出格式：
+  🔴 严重问题（必须修复）
+  🟡 建议改进
+  🟢 最佳实践建议"
+
+你 → 私聊 @DevOps（同时）:
+"运行全量测试并报告结果：
+  cd /project
+  pnpm install
+  pnpm lint
+  pnpm test
+  pnpm build
+  docker compose up -d
+  curl -s http://localhost:3001/health"
+```
+
+### 4.5 Phase 4：交付
+
+```
+你 → 私聊 @产品文档:
+"为用户管理模块生成以下文档：
+
+1. API 文档（OpenAPI 3.0 格式）
+   - 所有端点的请求/响应 Schema
+   - 认证说明
+   - 错误码表
+
+2. 项目 README.md
+   - 项目简介
+   - 快速开始（Docker 一键启动）
+   - 技术架构图
+   - 目录结构说明
+
+3. 部署指南
+   - Docker 部署步骤
+   - 环境变量说明
+   - 数据库迁移说明"
+
+你 → 私聊 @DevOps:
+"构建并部署到测试环境：
+  docker compose -f docker-compose.prod.yml build
+  docker compose -f docker-compose.prod.yml up -d
+  # 验证部署成功
+  curl -s http://localhost/health"
+```
+
+---
+
+## 五、监工策略
+
+### 5.1 Sprint 看板
+
+```
+┌────────────┬────────────┬────────────┬────────────┐
+│   待办      │   进行中    │   审查中    │   完成      │
+├────────────┼────────────┼────────────┼────────────┤
+│            │ 用户列表页  │ 数据库设计  │ Docker环境  │
+│            │ 用户详情页  │            │ CI/CD配置   │
+│ API文档    │ 后端API    │            │            │
+│ 部署上线    │            │            │            │
+└────────────┴────────────┴────────────┴────────────┘
+```
+
+### 5.2 关键里程碑检查
+
+| 里程碑 | 检查内容 | 参与角色 |
+|--------|---------|---------|
+| DB Ready | Schema 合理、索引完整 | 数据库设计 |
+| API Ready | 所有端点可用、测试通过 | 后端 + DevOps |
+| UI Ready | 页面完成、对接 API | 前端 ×2 |
+| QA Pass | 审查通过、无严重问题 | 代码审查 |
+| Ship It | 部署成功、文档完整 | DevOps + 文档 |
+
+---
+
+## 六、Roadmap 配置
+
+```json
+{
+  "roadmap": {
+    "objective": "用户管理模块 MVP - 1 周交付",
+    "tasks": [
+      { "id": 1, "number": "01", "title": "数据库 Schema 设计", "status": "done" },
+      { "id": 2, "number": "02", "title": "Docker 开发环境搭建", "status": "done" },
+      { "id": 3, "number": "03", "title": "后端 API 实现 (Auth + CRUD)", "status": "in-progress" },
+      { "id": 4, "number": "04", "title": "前端登录/注册页面", "status": "in-progress" },
+      { "id": 5, "number": "05", "title": "前端用户管理页面", "status": "in-progress" },
+      { "id": 6, "number": "06", "title": "代码安全审查", "status": "pending" },
+      { "id": 7, "number": "07", "title": "API 文档 + README", "status": "pending" },
+      { "id": 8, "number": "08", "title": "部署上线", "status": "pending" }
+    ]
+  }
+}
+```
+
+---
+
+## 七、扩缩容建议
+
+| 场景 | 调整方案 | 助手总数 |
+|------|---------|---------|
+| 纯前端项目 | 去掉后端+数据库 | 5 |
+| 加入测试 | 增加 2 个测试专家 | 9 |
+| 微服务架构 | 增加 2 个后端 | 9 |
+| 多端开发 | 增加移动端开发 | 8 |
+
+---
+
+*关联文档：[编码助手](../workers/worker-coding-assistant.md) | [后端开发](../workers/worker-backend-dev.md) | [数据库设计师](../workers/worker-database-designer.md) | [DevOps 工程师](../workers/worker-devops-engineer.md) | [文档工程师](../workers/worker-docs-writer.md) | [安全审查员](../workers/worker-security-reviewer.md)*

@@ -1,0 +1,168 @@
+# AI 员工档案：测试专家（单元测试）
+
+> **角色代号**：Test Expert  
+> **推荐 CLI**：Claude Code  
+> **角色类型**：`assistant`  
+> **出现方案**：方案一、四
+
+---
+
+## 一、基础信息
+
+| 属性 | 值 |
+|------|-----|
+| 角色定位 | 单元测试 + 组件测试编写 |
+| 推荐 CLI | Claude Code |
+| 推荐实例数 | 1-3（按项目规模） |
+| 沙盒模式 | ❌ 关闭（需要读取源码） |
+| 无限制模式 | ✅ 开启 |
+
+---
+
+## 二、golutra 配置
+
+```json
+{
+  "id": "{ULID}",
+  "name": "{workspace}-assistant-claude-{N}",
+  "roleKey": "members.roles.aiAssistant",
+  "roleType": "assistant",
+  "avatar": "css:mint",
+  "status": "online",
+  "terminalType": "claude",
+  "terminalCommand": "claude",
+  "autoStartTerminal": true,
+  "unlimitedAccess": true,
+  "sandboxed": false
+}
+```
+
+---
+
+## 三、职责定义
+
+| 测试类型 | 框架 | 覆盖范围 |
+|---------|------|---------|
+| 工具函数单测 | Vitest | src/utils/ |
+| Composable 测试 | Vitest + @vue/test-utils | src/composables/ |
+| Pinia Store 测试 | Vitest + @pinia/testing | src/stores/ |
+| 组件渲染测试 | Vitest + @vue/test-utils | src/components/ |
+
+---
+
+## 四、核心 Skill
+
+```json
+[
+  { "nameKey": "skill.vitest", "icon": "🧪", "ver": "2.x" },
+  { "nameKey": "skill.vue-test-utils", "icon": "🔧", "ver": "2.x" },
+  { "nameKey": "skill.testing-library", "icon": "🏗️", "ver": "1.0" },
+  { "nameKey": "skill.mocking", "icon": "🎭", "ver": "1.0" },
+  { "nameKey": "skill.coverage", "icon": "📊", "ver": "1.0" }
+]
+```
+
+---
+
+## 五、Prompt 模板库
+
+### 5.1 工具函数测试
+
+```
+为 {函数名} 编写 Vitest 单元测试。
+
+函数位置：{文件路径}
+函数签名：{签名}
+
+测试覆盖：
+1. 正常输入 → 预期输出
+2. 边界值（空值、零、极大/极小）
+3. 异常输入（undefined、null、错误类型）
+4. 特殊字符 / Unicode
+
+结构要求：
+- describe 块按测试维度分组
+- it.each 减少重复
+- Mock 外部依赖
+- 清晰的测试命名
+```
+
+### 5.2 Composable 测试
+
+```
+为 {composable名} 编写 Vue 3 Composable 测试。
+
+位置：{文件路径}
+
+测试维度：
+1. 初始状态验证
+2. 响应式数据变更
+3. 生命周期副作用（onMounted / onUnmounted）
+4. watch / watchEffect 触发
+5. 错误处理分支
+6. 组件卸载后的清理
+
+使用 @vue/test-utils renderHook 或自定义 wrapper。
+```
+
+### 5.3 Pinia Store 测试
+
+```
+为 {store名} Pinia Store 编写测试。
+
+位置：{文件路径}
+
+测试维度：
+1. 初始 state
+2. Getters 计算结果
+3. Actions 执行后状态变更
+4. 异步 Actions（loading / error / success）
+5. Store 间交互
+6. $reset() 重置
+
+每个测试创建新 Pinia 实例，确保隔离。
+```
+
+### 5.4 组件测试
+
+```
+为 {组件名} 编写组件测试。
+
+位置：{文件路径}
+
+测试维度：
+1. Props 渲染（不同 props 组合）
+2. 事件触发（click、input、submit）
+3. Slot 渲染
+4. 条件渲染（v-if / v-show）
+5. 异步操作（API 调用 mock）
+6. 可访问性（aria 属性验证）
+
+使用 @vue/test-utils mount / shallowMount。
+```
+
+---
+
+## 六、协作关系
+
+```
+上游：编码助手 → 代码完成 → 测试专家
+
+下游：测试专家 → 测试代码 → Shell 执行器（运行验证）
+      测试专家 → 失败报告 → 编码助手（修复代码）
+```
+
+---
+
+## 七、微调建议
+
+| 场景 | 调整 |
+|------|------|
+| 新项目 | 与编码助手并行，TDD 模式 |
+| 遗留项目 | 按模块分批补测试 |
+| 高覆盖率要求 | 增加实例数，并行编写 |
+| CI 集成 | 测试输出需要 CI 兼容格式 |
+
+---
+
+*关联方案：[方案一](../schemes/scheme-01-personal-fullstack.md) | [方案四](../schemes/scheme-04-test-automation.md)*

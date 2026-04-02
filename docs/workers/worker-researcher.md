@@ -1,0 +1,203 @@
+# AI 员工档案：技术研究员
+
+> **角色代号**：Technical Researcher  
+> **推荐 CLI**：Claude Code + Gemini CLI（混合使用）  
+> **角色类型**：`assistant`  
+> **出现方案**：方案六
+
+---
+
+## 一、基础信息
+
+| 属性 | 值 |
+|------|-----|
+| 角色定位 | 技术调研、方案对比、选型分析 |
+| 推荐 CLI | Claude（深度分析）+ Gemini（信息检索）|
+| 推荐实例数 | 2 Claude + 2 Gemini |
+| 沙盒模式 | ❌ 关闭 |
+| 无限制模式 | ✅ 开启 |
+
+---
+
+## 二、golutra 配置
+
+### Claude 研究员
+
+```json
+{
+  "id": "{ULID}",
+  "name": "{workspace}-assistant-claude-{N}",
+  "roleKey": "members.roles.aiAssistant",
+  "roleType": "assistant",
+  "avatar": "css:orbit",
+  "status": "online",
+  "terminalType": "claude",
+  "terminalCommand": "claude",
+  "autoStartTerminal": true,
+  "unlimitedAccess": true,
+  "sandboxed": false
+}
+```
+
+### Gemini 研究员
+
+```json
+{
+  "id": "{ULID}",
+  "name": "{workspace}-assistant-gemini-{N}",
+  "roleKey": "members.roles.aiAssistant",
+  "roleType": "assistant",
+  "avatar": "css:mint",
+  "status": "online",
+  "terminalType": "gemini",
+  "terminalCommand": "gemini",
+  "autoStartTerminal": true,
+  "unlimitedAccess": true,
+  "sandboxed": false
+}
+```
+
+---
+
+## 三、职责分工
+
+| 研究员 | CLI | 擅长维度 |
+|--------|-----|---------|
+| Claude 研究员-1 | Claude | 原理层：架构分析、设计模式、实现原理 |
+| Claude 研究员-2 | Claude | 实战层：代码对比、PoC 实现、最佳实践 |
+| Gemini 研究员-1 | Gemini | 数据层：社区数据、采用率、趋势分析 |
+| Gemini 研究员-2 | Gemini | 风险层：兼容性、迁移成本、长期维护风险 |
+
+---
+
+## 四、核心 Skill
+
+```json
+[
+  { "nameKey": "skill.technical-research", "icon": "🔬", "ver": "1.0" },
+  { "nameKey": "skill.comparison-analysis", "icon": "⚖️", "ver": "1.0" },
+  { "nameKey": "skill.poc-development", "icon": "🧪", "ver": "1.0" },
+  { "nameKey": "skill.report-writing", "icon": "📊", "ver": "1.0" }
+]
+```
+
+---
+
+## 五、Prompt 模板库
+
+### 5.1 原理分析（Claude）
+
+```
+深度分析 {技术/框架} 的内部工作原理：
+
+分析维度：
+1. 核心架构设计
+2. 关键算法/数据结构
+3. 与 {竞品} 的架构差异
+4. 设计权衡（Trade-offs）
+5. 已知限制
+
+输出格式：
+- 架构图（文本描述）
+- 核心概念解释
+- 优缺点总结
+- 适用/不适用场景
+```
+
+### 5.2 代码对比（Claude）
+
+```
+用代码对比 {方案A} vs {方案B} vs {方案C}：
+
+实现相同功能：{功能描述}
+
+对比维度：
+1. 代码量
+2. 可读性
+3. 类型安全
+4. 可测试性
+5. 性能开销
+
+每个方案给出完整可运行代码。
+```
+
+### 5.3 数据搜集（Gemini）
+
+```
+搜集 {技术/框架} 的生态数据：
+
+数据项：
+1. GitHub Stars 和增长趋势
+2. npm 周下载量
+3. Issue/PR 活跃度
+4. 主要使用者/公司
+5. 相关生态包数量
+6. 文档/教程数量和质量
+7. Stack Overflow 问题数
+8. 最近一年的重大更新
+
+请给出数据来源。
+```
+
+### 5.4 风险评估（Gemini）
+
+```
+评估采用 {技术/框架} 的风险：
+
+评估维度：
+1. 与 {现有技术栈} 的兼容性
+2. 迁移成本（人天估算）
+3. 学习曲线
+4. 长期维护前景（资金、团队、路线图）
+5. 潜在的 breaking changes
+6. 锁定风险（vendor lock-in）
+7. 安全风险（CVE 历史）
+
+输出：风险矩阵（影响 × 概率）
+```
+
+---
+
+## 六、协作模式
+
+### 6.1 交叉验证模式
+
+```
+4 个研究员各自输出报告
+   │
+   ▼
+你对比报告，发现分歧点
+   │
+   ▼
+@All 追问分歧，要求补充论据
+   │
+   ▼
+再次汇总 → 最终决策
+```
+
+### 6.2 竞赛模式
+
+```
+2 个 Claude 各自给出推荐方案
+   │
+   ▼
+2 个 Gemini 分别验证两个方案的数据
+   │
+   ▼
+你根据数据支撑做决策
+```
+
+---
+
+## 七、微调建议
+
+| 调研类型 | 重点 |
+|---------|------|
+| 框架选型 | 原理 + 生态 + 迁移成本 |
+| 库对比 | 代码对比 + 性能基准 |
+| 架构决策 | 设计权衡 + 长期维护 |
+| 技术趋势 | 社区数据 + 采用率 |
+
+---
+
+*关联方案：[方案六](../schemes/scheme-06-research-docs.md)*

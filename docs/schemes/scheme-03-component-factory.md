@@ -1,0 +1,349 @@
+# 方案三：前端组件工厂（批量生产模式）
+
+> **方案代号**：Component Factory  
+> **适用场景**：UI 组件库建设、设计系统落地、大量页面开发  
+> **推荐指数**：⭐⭐⭐⭐  
+> **所需 CLI**：Claude Code  
+> **AI 员工总数**：7 个（5 工人 + 1 类型 + 1 文档）  
+> **预计效率提升**：500%–800%（5 倍并行生产）
+
+---
+
+## 一、方案概述
+
+像流水线工厂一样批量生产前端组件。5 个组件工人同时编写不同组件，1 个类型工程师统一 TypeScript 类型，1 个文档工程师生成 Storybook 和文档。
+
+### 核心理念
+
+```
+你（产品监工）── 组件规格下发
+  │
+  ├── 🏭 组件工人-1  →  Button / Input / Badge ...
+  ├── 🏭 组件工人-2  →  Modal / Dialog / Drawer ...
+  ├── 🏭 组件工人-3  →  Tabs / Accordion / Collapse ...
+  ├── 🏭 组件工人-4  →  Select / Combobox / TreeSelect ...
+  ├── 🏭 组件工人-5  →  DatePicker / TimePicker / Calendar ...
+  │
+  ├── 📋 类型工人    →  统一 TypeScript 类型导出
+  └── 📖 文档工人    →  Storybook stories + README
+```
+
+### 为什么 5 个组件工人？
+
+- 经测试，5 个是并行效率和管理成本的最佳平衡点
+- 超过 5 个时，你作为监工难以同时关注所有进度
+- 类型和文档工人在组件完成后才工作，属于流水线下游
+
+---
+
+## 二、完整成员配置
+
+### 2.1 成员配置表
+
+| # | 角色定位 | roleType | terminalType | terminalCommand | instances | unlimitedAccess | sandboxed |
+|---|---------|----------|-------------|-----------------|-----------|----------------|-----------|
+| 0 | 👑 产品监工 | `owner` | — | — | 1 | — | — |
+| 1 | 🏭 组件工人 | `assistant` | `claude` | `claude` | 5 | ✅ | ❌ |
+| 2 | 📋 类型工人 | `assistant` | `claude` | `claude` | 1 | ✅ | ❌ |
+| 3 | 📖 文档工人 | `assistant` | `claude` | `claude` | 1 | ✅ | ❌ |
+
+> 注意：邀请 5 个 Claude 助手时，instances 设为 5，golutra 会自动生成 `-1` 到 `-5` 的编号。
+
+---
+
+## 三、架构设计
+
+### 3.1 流水线架构
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                       Component Factory Pipeline                  │
+│                                                                  │
+│  Phase 1: 并行生产                                                │
+│  ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐                             │
+│  │工人1│ │工人2│ │工人3│ │工人4│ │工人5│                             │
+│  │    │ │    │ │    │ │    │ │    │                             │
+│  │Btn │ │Mod │ │Tab │ │Sel │ │Date│  ← 各自独立编写                │
+│  │Inp │ │Dlg │ │Acc │ │Com │ │Time│                             │
+│  │Bdg │ │Drw │ │Col │ │Tre │ │Cal │                             │
+│  └──┬─┘ └──┬─┘ └──┬─┘ └──┬─┘ └──┬─┘                             │
+│     │      │      │      │      │                               │
+│     ▼      ▼      ▼      ▼      ▼                               │
+│  Phase 2: 类型统一                                                │
+│  ┌──────────────────────────────────┐                            │
+│  │ 📋 类型工人                       │                            │
+│  │ → 统一导出文件 index.ts           │                            │
+│  │ → Props/Events/Slots 类型        │                            │
+│  │ → 泛型约束                        │                            │
+│  └──────────────┬───────────────────┘                            │
+│                 ▼                                                │
+│  Phase 3: 文档生成                                                │
+│  ┌──────────────────────────────────┐                            │
+│  │ 📖 文档工人                       │                            │
+│  │ → Storybook stories             │                            │
+│  │ → Props 文档表格                  │                            │
+│  │ → 使用示例代码                    │                            │
+│  └──────────────────────────────────┘                            │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### 3.2 组件分类与分配策略
+
+| 组件类别 | 工人编号 | 组件列表 | 预计工时 |
+|---------|---------|---------|---------|
+| 基础输入 | 工人-1 | Button, Input, Textarea, Badge, Tag | 40min |
+| 覆盖层 | 工人-2 | Modal, Dialog, Drawer, Popover, Tooltip | 50min |
+| 导航/折叠 | 工人-3 | Tabs, Accordion, Collapse, Breadcrumb, Pagination | 45min |
+| 选择器 | 工人-4 | Select, Combobox, TreeSelect, Checkbox, Radio | 50min |
+| 日期时间 | 工人-5 | DatePicker, TimePicker, Calendar, DateRangePicker | 55min |
+
+---
+
+## 四、使用流程详解
+
+### 4.1 Phase 1：并行生产
+
+```
+你 → 私聊 @组件工人-1:
+"用 Vue 3 Composition API + TypeScript + Tailwind CSS 实现以下组件：
+
+## Button 组件
+- Props: variant(primary|secondary|ghost|danger), size(sm|md|lg), 
+  disabled, loading, icon, iconPosition(left|right)
+- Events: click
+- Slots: default, icon
+- 功能：loading 时显示 spinner 并禁用，支持 icon-only 模式
+- a11y: 使用 <button> 标签，disabled 时 aria-disabled
+
+## Input 组件  
+- Props: modelValue, type(text|password|email|number), placeholder,
+  disabled, clearable, prefix, suffix, size(sm|md|lg), status(default|error|success)
+- Events: update:modelValue, focus, blur, clear
+- Slots: prefix, suffix
+- 功能：v-model 绑定，clearable 时显示清除按钮
+- a11y: label 关联，错误提示 aria-describedby
+
+## Badge 组件
+- Props: count, max, dot, color, size(sm|md)
+- Slots: default
+- 功能：count>max 时显示 max+，dot 模式只显示圆点
+
+每个组件输出：
+1. {组件名}.vue - SFC 文件
+2. {组件名}.test.ts - Vitest 单元测试
+3. types.ts - 导出的类型定义"
+```
+
+（同时向其他 4 个工人下发类似的组件规格...）
+
+### 4.2 Phase 2：类型统一
+
+```
+（等所有工人状态变为 Online）
+
+你 → 私聊 @类型工人:
+"5 个组件工人已完成以下组件的开发。请：
+
+1. 检查所有组件的 TypeScript 类型定义是否一致
+2. 生成统一的 src/components/index.ts 导出文件
+3. 确保所有 Props 都使用 defineProps + withDefaults
+4. 确保所有 Events 都使用 defineEmits 类型声明
+5. 检查泛型使用是否正确（如 Select<T>）
+6. 生成 src/components/types.ts 统一类型文件
+
+组件清单：
+Button, Input, Textarea, Badge, Tag,
+Modal, Dialog, Drawer, Popover, Tooltip,
+Tabs, Accordion, Collapse, Breadcrumb, Pagination,
+Select, Combobox, TreeSelect, Checkbox, Radio,
+DatePicker, TimePicker, Calendar, DateRangePicker"
+```
+
+### 4.3 Phase 3：文档生成
+
+```
+你 → 私聊 @文档工人:
+"为所有组件生成文档：
+
+1. Storybook stories
+   - 每个组件一个 .stories.ts 文件
+   - 包含：Default / All Variants / Interactive / Dark Mode stories
+   - 使用 Storybook 7 CSF 3 格式
+
+2. 组件 README.md
+   - Props 表格（名称/类型/默认值/说明）
+   - Events 表格
+   - Slots 表格
+   - 使用示例代码（至少 3 个场景）
+   - 注意事项
+
+3. 总索引文件
+   - src/components/README.md 列出所有组件
+   - 按类别组织
+   - 包含安装和使用说明"
+```
+
+---
+
+## 五、组件规格模板
+
+### 5.1 标准组件规格模板
+
+以下模板可复制粘贴后填充使用：
+
+```
+用 Vue 3 Composition API + TypeScript + Tailwind CSS 实现 {组件名} 组件。
+
+技术要求：
+- Vue 3.5+, TypeScript 5.x, Tailwind CSS 3.x
+- <script setup lang="ts"> 语法
+- Props 使用 defineProps + withDefaults
+- Events 使用 defineEmits 类型声明
+- 支持暗色模式（dark: prefix）
+- 响应式（mobile-first）
+
+## Props
+| 名称 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| {prop1} | {type} | {default} | {description} |
+
+## Events
+| 名称 | 参数 | 说明 |
+|------|------|------|
+| {event1} | {payload type} | {description} |
+
+## Slots
+| 名称 | Props | 说明 |
+|------|-------|------|
+| {slot1} | {scope} | {description} |
+
+## 功能需求
+1. {功能1}
+2. {功能2}
+
+## 可访问性
+1. 使用语义化标签
+2. 键盘可操作
+3. ARIA 属性完整
+4. 焦点管理
+
+## 输出文件
+1. {组件名}.vue
+2. {组件名}.test.ts (Vitest)
+3. 组件内的 types 导出
+```
+
+### 5.2 复杂组件规格模板
+
+```
+用 Vue 3 Composition API + TypeScript + Tailwind CSS 实现 {组件名} 组件。
+
+这是一个复杂组件，请按以下结构实现：
+
+## 文件结构
+{组件名}/
+├── {组件名}.vue          # 主组件
+├── {子组件1}.vue         # 子组件
+├── {子组件2}.vue         # 子组件
+├── use{组件名}.ts        # 核心逻辑 composable
+├── types.ts              # 类型定义
+├── constants.ts          # 常量
+├── {组件名}.test.ts      # 测试
+└── index.ts              # 导出
+
+## 组件 API
+{详细的 Props / Events / Slots / Expose 描述}
+
+## 内部状态设计
+{状态流转图}
+
+## 边界情况
+1. {边界1}
+2. {边界2}
+
+## 性能要求
+1. {性能要求1}
+2. {性能要求2}
+```
+
+---
+
+## 六、监工策略详解
+
+### 6.1 进度跟踪
+
+```
+每个工人预期 40-55 分钟完成一批组件。
+
+监控节奏：
+00:00  下发任务
+05:00  快速检查：所有工人是否进入 Working 状态
+15:00  巡视一轮：点击每个工人头像看进度
+30:00  中期检查：第一个组件是否完成，质量如何
+45:00  收尾检查：大部分组件应该完成
+60:00  全部应该 Online，进入 Phase 2
+```
+
+### 6.2 质量一致性保证
+
+**问题**：5 个工人各自编写，风格可能不一致
+
+**解决方案**：
+1. 在规格中明确编码规范
+2. 第一个工人完成后，将其代码作为 "参考样例" 发给其他工人
+3. 类型工人负责最终的一致性检查
+
+```
+你 → 群聊 @组件工人-2 @组件工人-3 @组件工人-4 @组件工人-5:
+"参考工人-1 完成的 Button.vue 的代码风格：
+ - 使用 const props = withDefaults(defineProps<Props>(), {...})
+ - CSS 类使用 Tailwind 组合
+ - 测试使用 describe/it 结构
+ 请保持一致。"
+```
+
+### 6.3 错误处理
+
+| 情况 | 处理方式 |
+|------|---------|
+| 某个工人卡住 | 终端注入 "请继续完成剩余组件" |
+| 组件质量不达标 | 私聊要求重写，给出具体问题 |
+| 工人之间代码冲突 | 让类型工人统一处理 |
+| 测试不通过 | 让对应工人修复，Shell 执行器验证 |
+
+---
+
+## 七、Roadmap 配置
+
+```json
+{
+  "roadmap": {
+    "objective": "完成 UI 组件库 v1.0",
+    "tasks": [
+      { "id": 1, "number": "01", "title": "基础输入组件（Button/Input/Badge）", "status": "in-progress" },
+      { "id": 2, "number": "02", "title": "覆盖层组件（Modal/Dialog/Drawer）", "status": "in-progress" },
+      { "id": 3, "number": "03", "title": "导航折叠组件（Tabs/Accordion）", "status": "in-progress" },
+      { "id": 4, "number": "04", "title": "选择器组件（Select/Combobox）", "status": "in-progress" },
+      { "id": 5, "number": "05", "title": "日期时间组件（DatePicker/Calendar）", "status": "in-progress" },
+      { "id": 6, "number": "06", "title": "TypeScript 类型统一", "status": "pending" },
+      { "id": 7, "number": "07", "title": "Storybook 文档生成", "status": "pending" }
+    ]
+  }
+}
+```
+
+---
+
+## 八、扩缩容建议
+
+| 场景 | 调整方案 | 工人总数 |
+|------|---------|---------|
+| 小型组件库（5-10 个） | 3 个工人 + 1 文档 | 4 |
+| 标准组件库（20-30 个） | 5 个工人 + 1 类型 + 1 文档 | 7 |
+| 大型设计系统（50+） | 8 个工人 + 2 类型 + 2 文档 | 12 |
+| 含测试 | 增加 2 个测试工人 | 9 |
+| 含 Code Review | 增加 1 个审查员 | 8 |
+
+---
+
+*关联文档：[编码助手](../workers/worker-coding-assistant.md) | [TypeScript 类型工程师](../workers/worker-type-engineer.md) | [文档工程师](../workers/worker-docs-writer.md)*

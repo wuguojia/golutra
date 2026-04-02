@@ -1,0 +1,342 @@
+# 方案四：前端测试自动化军团
+
+> **方案代号**：Test Automation Squad  
+> **适用场景**：提高测试覆盖率、补全历史遗留代码的测试  
+> **推荐指数**：⭐⭐⭐⭐  
+> **所需 CLI**：Claude Code + 系统终端  
+> **AI 员工总数**：7 个（3 单测 + 2 E2E + 2 执行器）  
+> **预计效率提升**：600%–1000%（测试编写并行化）
+
+---
+
+## 一、方案概述
+
+前端测试覆盖率低是普遍痛点，手动补测试既枯燥又耗时。本方案用 3 个单测专家和 2 个 E2E 专家并行编写测试，2 个 Shell 执行器负责运行验证，形成"写 → 跑 → 修"三轮流水线。
+
+### 核心理念
+
+```
+你（QA 监工）
+  │
+  │── Phase 1: 并行编写 ────────────────────────┐
+  ├── 🧪 单测专家-1  →  src/utils/ 工具函数测试    │
+  ├── 🧪 单测专家-2  →  src/composables/ 组合式测试 │ 并行
+  ├── 🧪 单测专家-3  →  src/stores/ 状态管理测试    │
+  ├── 🌐 E2E专家-1   →  核心业务流程 E2E           │
+  ├── 🌐 E2E专家-2   →  边界场景 E2E              │
+  │                                              │
+  │── Phase 2: 运行验证 ────────────────────────┐│
+  ├── ⚙️ 执行器-1    →  pnpm test --coverage    ││
+  ├── ⚙️ 执行器-2    →  npx playwright test     ││
+  │                                              │
+  │── Phase 3: 修复失败测试 ──────────────────────┘
+  └── @对应专家修复 → @执行器验证 → 循环直到通过
+```
+
+---
+
+## 二、完整成员配置
+
+### 2.1 成员配置表
+
+| # | 角色定位 | roleType | terminalType | terminalCommand | instances | unlimitedAccess | sandboxed |
+|---|---------|----------|-------------|-----------------|-----------|----------------|-----------|
+| 0 | 👑 QA 监工 | `owner` | — | — | 1 | — | — |
+| 1 | 🧪 单测专家 | `assistant` | `claude` | `claude` | 3 | ✅ | ❌ |
+| 2 | 🌐 E2E 专家 | `assistant` | `claude` | `claude` | 2 | ✅ | ❌ |
+| 3 | ⚙️ 执行器 | `assistant` | `shell` | `bash` | 2 | ✅ | ❌ |
+
+### 2.2 配置说明
+
+- **单测专家 ×3**：分别负责 utils、composables、stores 三个方向
+- **E2E 专家 ×2**：一个负责核心流程，一个负责边界场景
+- **执行器 ×2**：一个跑单元测试，一个跑 E2E 测试，互不阻塞
+
+---
+
+## 三、架构设计
+
+### 3.1 三轮流水线
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    Test Automation Pipeline                    │
+│                                                              │
+│  Round 1: Write (并行编写)                                    │
+│  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐              │
+│  │单测-1 │ │单测-2 │ │单测-3 │ │E2E-1 │ │E2E-2 │              │
+│  │utils/ │ │comp/ │ │store/│ │核心  │ │边界  │              │
+│  └──┬───┘ └──┬───┘ └──┬───┘ └──┬───┘ └──┬───┘              │
+│     │        │        │        │        │                    │
+│     ▼        ▼        ▼        ▼        ▼                    │
+│  Round 2: Run (运行验证)                                      │
+│  ┌─────────────────────┐ ┌─────────────────────┐            │
+│  │ ⚙️ 执行器-1          │ │ ⚙️ 执行器-2          │            │
+│  │ pnpm test --coverage│ │ npx playwright test │            │
+│  └──────────┬──────────┘ └──────────┬──────────┘            │
+│             │                       │                        │
+│             ▼                       ▼                        │
+│  Round 3: Fix (修复失败)                                      │
+│  ┌──────────────────────────────────────────┐                │
+│  │ 将失败报告发回对应专家 → 修复 → 再次运行   │                │
+│  │ 循环直到: 测试全部通过 + 覆盖率达标       │                │
+│  └──────────────────────────────────────────┘                │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### 3.2 测试分配策略
+
+| 测试范围 | 负责人 | 测试框架 | 目标覆盖率 |
+|---------|--------|---------|-----------|
+| src/utils/ | 单测专家-1 | Vitest | 90%+ |
+| src/composables/ | 单测专家-2 | Vitest + @vue/test-utils | 85%+ |
+| src/stores/ | 单测专家-3 | Vitest + Pinia testing | 85%+ |
+| 核心业务流程 | E2E专家-1 | Playwright | 关键路径 100% |
+| 边界/异常场景 | E2E专家-2 | Playwright | 高风险场景 80%+ |
+
+---
+
+## 四、使用流程详解
+
+### 4.1 Round 1：并行编写
+
+```
+你 → 私聊 @单测专家-1:
+"为 src/utils/ 目录下所有工具函数编写 Vitest 单元测试。
+
+目标目录：src/utils/
+测试目录：src/utils/__tests__/
+
+每个工具函数的测试需覆盖：
+1. 正常输入的预期输出
+2. 边界值（空字符串、null、undefined、0、负数）
+3. 异常输入（类型错误、超出范围）
+4. 特殊字符处理
+
+测试文件命名：{函数名}.test.ts
+使用 describe/it 结构
+Mock 外部依赖（API 调用、localStorage 等）"
+
+你 → 私聊 @单测专家-2:
+"为 src/composables/ 目录下所有 Vue 3 Composable 编写测试。
+
+使用 @vue/test-utils + Vitest：
+1. 响应式数据的初始值和变更
+2. 生命周期钩子（onMounted, onUnmounted）
+3. watch/watchEffect 的触发
+4. 组件卸载后的清理逻辑
+5. 错误处理分支
+
+注意：
+- 使用 renderHook 或在测试组件中挂载
+- Mock Tauri IPC 调用
+- 测试异步操作（nextTick, flushPromises）"
+
+你 → 私聊 @单测专家-3:
+"为 src/stores/ 目录下所有 Pinia Store 编写测试。
+
+使用 @pinia/testing + Vitest：
+1. Store 初始状态
+2. Actions 的执行和状态变更
+3. Getters 的计算结果
+4. 异步 Actions 的 loading/error 状态
+5. Store 之间的交互
+
+注意：
+- 每个测试创建新的 Pinia 实例
+- Mock 外部 API 调用
+- 测试 $reset() 方法"
+
+你 → 私聊 @E2E专家-1:
+"用 Playwright 编写核心业务流程的 E2E 测试。
+
+测试场景：
+1. 用户登录 → 进入首页 → 验证欢迎信息
+2. 用户列表 → 搜索 → 翻页 → 查看详情
+3. 创建新用户 → 填写表单 → 提交 → 验证创建成功
+4. 编辑用户 → 修改信息 → 保存 → 验证更新
+
+测试文件：tests/e2e/{流程名}.spec.ts
+使用 Page Object 模式封装
+包含截图对比（toHaveScreenshot）"
+
+你 → 私聊 @E2E专家-2:
+"用 Playwright 编写边界和异常场景的 E2E 测试。
+
+测试场景：
+1. 网络断开时的错误处理
+2. 表单校验（所有校验规则）
+3. 并发操作（双击提交、快速切换）
+4. 大数据量（1000+ 条列表滚动）
+5. 权限不足时的跳转
+6. Session 过期时的重新登录"
+```
+
+### 4.2 Round 2：运行验证
+
+```
+（等所有专家状态变为 Online）
+
+你 → 私聊 @执行器-1:
+"cd /path/to/project && pnpm test -- --coverage --reporter=verbose"
+
+你 → 私聊 @执行器-2:
+"cd /path/to/project && npx playwright test --reporter=list"
+```
+
+**查看执行器终端输出**，关注：
+- 失败的测试名称和错误信息
+- 覆盖率报告（Statements / Branches / Functions / Lines）
+- E2E 测试的截图对比结果
+
+### 4.3 Round 3：修复
+
+```
+根据执行器输出的失败信息，分发修复任务：
+
+你 → 私聊 @单测专家-1:
+"以下测试失败，请修复：
+
+FAIL src/utils/__tests__/formatDate.test.ts
+  ✗ should handle timezone offset (AssertionError)
+  ✗ should return empty string for invalid date
+
+错误原因分析后修复测试代码。"
+
+修复后 → 再次 @执行器-1 运行
+
+循环直到全部通过。
+```
+
+---
+
+## 五、测试 Prompt 模板库
+
+### 5.1 工具函数单测模板
+
+```
+为 {函数名} 编写 Vitest 单元测试。
+
+函数签名：
+{函数签名}
+
+测试用例需覆盖：
+1. 基本功能：{正常输入 → 预期输出}
+2. 边界值：空值、零值、极大/极小值
+3. 异常输入：undefined、null、错误类型
+4. 特殊情况：{特殊场景}
+
+要求：
+- 每个 describe 块对应一个测试维度
+- 使用 it.each 减少重复代码
+- Mock 所有外部依赖
+- 断言使用 expect().toBe / toEqual / toThrow
+```
+
+### 5.2 Composable 测试模板
+
+```
+为 {composable名} 编写 Vue 3 Composable 测试。
+
+Composable 签名：
+{签名}
+
+测试维度：
+1. 初始状态：调用后返回值的初始状态
+2. 响应式：修改入参后返回值是否更新
+3. 生命周期：onMounted/onUnmounted 的副作用
+4. 错误处理：异常情况的降级行为
+5. 清理：组件卸载后是否正确清理
+
+使用 @vue/test-utils 的 renderHook 或自定义 wrapper。
+Mock Tauri IPC 调用。
+```
+
+### 5.3 E2E 测试模板
+
+```
+用 Playwright 编写 {场景名} 的 E2E 测试。
+
+场景描述：
+{用户操作流程}
+
+测试步骤：
+1. {步骤1}
+2. {步骤2}
+...
+
+断言：
+1. {预期结果1}
+2. {预期结果2}
+
+要求：
+- 使用 Page Object 模式
+- 等待策略：使用 waitForSelector / waitForNavigation
+- 截图对比：关键步骤 toHaveScreenshot
+- 数据清理：测试后恢复初始状态
+```
+
+---
+
+## 六、监工策略
+
+### 6.1 覆盖率目标追踪
+
+```
+目标覆盖率：
+  Statements: 80%+
+  Branches:   75%+
+  Functions:  80%+
+  Lines:      80%+
+
+追踪方式：
+  每轮运行后查看执行器终端输出的覆盖率报告
+  未达标的模块 → 追加任务给对应专家
+```
+
+### 6.2 测试质量评估
+
+| 维度 | 好的测试 | 差的测试 |
+|------|---------|---------|
+| 独立性 | 每个测试独立运行 | 测试之间有依赖 |
+| 可读性 | 测试名说明意图 | 测试名不清晰 |
+| 覆盖性 | 覆盖正常/边界/异常 | 只测正常情况 |
+| 稳定性 | 不依赖时间/网络 | 会间歇性失败 |
+| 速度 | 单个测试 <100ms | 测试过慢 |
+
+---
+
+## 七、Roadmap 配置
+
+```json
+{
+  "roadmap": {
+    "objective": "测试覆盖率从 30% 提升到 80%",
+    "tasks": [
+      { "id": 1, "number": "01", "title": "工具函数单元测试 (src/utils/)", "status": "in-progress" },
+      { "id": 2, "number": "02", "title": "Composable 单元测试 (src/composables/)", "status": "in-progress" },
+      { "id": 3, "number": "03", "title": "Pinia Store 单元测试 (src/stores/)", "status": "in-progress" },
+      { "id": 4, "number": "04", "title": "核心流程 E2E 测试", "status": "in-progress" },
+      { "id": 5, "number": "05", "title": "边界场景 E2E 测试", "status": "in-progress" },
+      { "id": 6, "number": "06", "title": "运行验证 + 覆盖率检查", "status": "pending" },
+      { "id": 7, "number": "07", "title": "修复失败测试", "status": "pending" },
+      { "id": 8, "number": "08", "title": "覆盖率达标确认", "status": "pending" }
+    ]
+  }
+}
+```
+
+---
+
+## 八、扩缩容建议
+
+| 场景 | 调整方案 | 助手总数 |
+|------|---------|---------|
+| 小项目 | 2 单测 + 1 E2E + 1 执行器 | 4 |
+| 标准项目 | 3 单测 + 2 E2E + 2 执行器 | 7 |
+| 大项目 | 5 单测 + 3 E2E + 3 执行器 | 11 |
+| 含组件测试 | 加 2 个组件测试专家 | 9 |
+
+---
+
+*关联文档：[测试专家](../workers/worker-test-expert.md) | [E2E 测试专家](../workers/worker-e2e-expert.md) | [Shell 执行器](../workers/worker-shell-executor.md)*

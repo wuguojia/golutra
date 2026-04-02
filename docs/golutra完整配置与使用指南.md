@@ -230,7 +230,7 @@ golutra 是一个**本地桌面应用**，它通过伪终端（PTY）驱动你�
 | 11 | DevOps 工程师 | Terminal | 1 | ✅ | ❌ | Docker/CI/CD/Nginx/部署 |
 | 12 | 数据库设计师 | Gemini CLI | 1 | ✅ | ❌ | Schema 设计、SQL、迁移脚本 |
 | 13 | 文档工程师 | Gemini CLI | 1 | ✅ | ❌ | API 文档、README、Storybook |
-| 14 | 技术研究员 | Claude + Gemini 混合 | 2+2 | ✅ | ❌ | 技术选型、方案对比、调研 |
+| 14 | 技术研究员 | Claude + Gemini 混合 | 4（2×Claude + 2×Gemini） | ✅ | ❌ | 技术选型、方案对比、调研 |
 | 15 | 需求分析师 | Claude Code | 1 | ✅ | ❌ | AI 项目经理，任务分解与调度 |
 
 > **记住**：在弹窗里你只能配 ①模型 ②数量 ③无限制 ④沙盒。角色的"名字"和"职责"是通过你在聊天中发的 Prompt 来定义的。

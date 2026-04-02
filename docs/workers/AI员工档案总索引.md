@@ -39,6 +39,7 @@
 | [Shell 执行器](Shell执行器.md) | 命令执行 | bash/zsh | 方案一/四/五 |
 | [DevOps 工程师](DevOps工程师.md) | 部署/CI/CD | bash/zsh | 方案五 |
 | [数据库设计师](数据库设计师.md) | Schema 设计 | Gemini CLI | 方案五 |
+| [技术栈探测员](技术栈探测员.md) | 项目技术栈探测与广播 | Claude Code | 所有方案 |
 
 ### 📝 文档/研究类
 

@@ -61,6 +61,9 @@ fn main() {
       async_exec: None,
     }
   } else {
+    if args.first().map(|value| value.as_str()) == Some("send") {
+      args.remove(0);
+    }
     let async_exec = if let Some(index) = args.iter().position(|value| value == "--async") {
       args.remove(index);
       true
